@@ -10,11 +10,11 @@ from reusablescripts import landing_script, udr_get_data
 
 TODAYS_DATE = "2025-TODAY"
 
-APT_NAME = "1301thomascircle"
-FOLDER_NAME = "1301ThomasCircle"
+APT_NAME = "themo"
+FOLDER_NAME = "TheMO"
 
-BASE_URL = "https://www.udr.com/washington-dc-apartments/logan-circle/1301-thomas-circle"
-MAIN_URL = "https://www.udr.com/washington-dc-apartments/logan-circle/1301-thomas-circle/apartments-pricing/"
+BASE_URL = "https://www.udr.com/washington-dc-apartments/union-market/the-mo"
+MAIN_URL = "https://www.udr.com/washington-dc-apartments/union-market/the-mo/apartments-pricing/"
 
 OUTPUT_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/" + TODAYS_DATE + "/" + FOLDER_NAME + "/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)

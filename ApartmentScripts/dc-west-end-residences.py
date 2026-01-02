@@ -69,7 +69,60 @@ pattern = re.compile(r"^westendresidences_\d+\.html$")
 
 for filename in os.listdir(OUTPUT_DIR):
 
-    if not pattern.match(filename): continue
+    if not pattern.match(filename):
+        continue
+
     path = os.path.join(OUTPUT_DIR, filename)
 
-    print(path)
+    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        soup = BeautifulSoup(f, "lxml")
+
+    # loop floorplans (ex: One Bedroom)
+    for fp in soup.select("div.floorplan-section"):
+
+        floorplan = fp.get("data-name")
+
+        # loop units
+        for tr in fp.select("tr.unit-container"):
+
+            # UNIT NUMBER
+            td = tr.select_one("td.td-card-name")
+            unit = next(
+                t.strip().replace("#", "")
+                for t in td.stripped_strings
+                if t.startswith("#")
+            )
+
+            # SQFT
+            td = tr.select_one("td.td-card-sqft")
+            sqft = td.contents[-1].strip()
+
+            # RENT
+            td = tr.select_one("td.td-card-rent")
+            rent_text = td.get_text(" ", strip=True)
+            rents = re.findall(r"\$([\d,]+)", rent_text)
+            rent_min = int(rents[0].replace(",", ""))
+
+            # AMENITIES
+            amenities = ", ".join(
+                li.get_text(strip=True)
+                for li in tr.select("td.td-card-details li")
+            )
+
+            # AVAILABLE DATE
+            td = tr.select_one("td.td-card-available")
+            available = td.contents[-1].strip()
+            if available.lower() == "available": available = "Now"
+
+            rows.append({
+                "unit_number": unit,
+                "floorplan_name": floorplan,
+                "available_date": available,
+                "starting_rent": rent_min,
+                "square_feet": sqft,
+                "building_number": None,
+                "amenities": amenities,
+                "specials": None
+            })
+
+pd.DataFrame(rows).to_csv(MAIN_CSV_FILE, index=False)
