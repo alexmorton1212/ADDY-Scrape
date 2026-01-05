@@ -2,7 +2,10 @@ import os
 import pandas as pd
 from bs4 import BeautifulSoup
 
-### Script for Single Page / Exploration
+
+# ------------------------------------------------------------------------------
+# Single Page
+# ------------------------------------------------------------------------------
 
 def landing_script(url, output_file):
 
@@ -28,7 +31,9 @@ def landing_script(url, output_file):
     '''
 
 
-### Scripts for Gables owned websites
+# ------------------------------------------------------------------------------
+# Gables
+# ------------------------------------------------------------------------------
 
 def gables_script(url, output_dir, base_name):
 
@@ -178,7 +183,9 @@ def gables_get_data(output_dir, csv, pattern):
     pd.DataFrame(rows).to_csv(csv, index=False)
 
 
-### Scripts for UDR owned websites
+# ------------------------------------------------------------------------------
+# UDR
+# ------------------------------------------------------------------------------
 
 def udr_get_data(html, csv):
 
@@ -235,7 +242,168 @@ def udr_get_data(html, csv):
     pd.DataFrame(rows).to_csv(csv, index=False)
 
 
-### Scripts for Sightmap websites
+# ------------------------------------------------------------------------------
+# Paginated
+# ------------------------------------------------------------------------------
+
+### Common Developers: Bozzuto
+
+def paginated_script(url, output_dir, base_name, has_next, go_next):
+
+    return f'''
+
+    set pageNum to 1
+
+    tell application "Google Chrome"
+        activate
+        open location "{url}"
+    end tell
+
+    delay 8
+
+    repeat
+
+        tell application "Google Chrome"
+            set html to execute front window's active tab javascript "
+                document.documentElement.outerHTML
+            "
+        end tell
+
+        set filePath to "{output_dir}" & "{base_name}_" & pageNum & ".html"
+        set f to open for access POSIX file filePath with write permission
+        write html to f
+        close access f
+
+        -- CHECK FOR NEXT PAGE
+
+        tell application "Google Chrome"
+            set hasNext to execute front window's active tab javascript "
+                {has_next}
+            "
+        end tell
+
+        if hasNext is \"\" then
+            exit repeat
+        end if
+
+        -- GO TO NEXT PAGE (IF IT EXISTS)
+
+        tell application "Google Chrome"
+            tell front window's active tab
+                execute javascript "
+                    {go_next}
+                "
+            end tell
+        end tell
+
+        set pageNum to pageNum + 1
+        delay 6
+
+    end repeat
+
+    tell application "Google Chrome"
+        close active tab of front window
+    end tell
+
+    '''
+
+
+# ------------------------------------------------------------------------------
+# Engrain
+# ------------------------------------------------------------------------------
+
+def engrain_get_labels(url):
+
+    return f'''
+
+    tell application "Google Chrome"
+        activate
+        open location "{url}"
+    end tell
+
+    delay 7
+
+    tell application "Google Chrome"
+        set floorLabels to execute front window's active tab javascript "
+            Array.from(
+              document.querySelectorAll('[data-jd-fp-selector=\\\"map-embed-floor\\\"]')
+            )
+            .filter(el => {{
+                const span = el.querySelector(
+                  '[data-jd-fp-selector=\\\"map-embed-floor-avail-count\\\"]'
+                );
+                if (!span) return false;
+                const val = span.textContent.trim();
+                return val !== '--' && !isNaN(val) && Number(val) > 0;
+            }})
+            .map(el => el.getAttribute('aria-label'))
+            .join(',');
+        "
+    end tell
+
+    return floorLabels
+
+    '''
+
+def engrain_script(output_dir, floor_labels, apt_name):
+
+    blocks = []
+
+    for label in floor_labels:
+        floor_num = label.replace("Floor ", "").strip()
+
+        blocks.append(f'''
+
+        delay 0.5
+
+        -- Click {label}
+        tell application "Google Chrome"
+            tell front window's active tab
+                execute javascript "
+                    document.querySelector(
+                      'a[aria-label=\\\"{label}\\\"]'
+                    )?.click();
+                "
+            end tell
+        end tell
+
+        delay 1
+
+        tell application "Google Chrome"
+            set html to execute front window's active tab javascript "
+                document.documentElement.outerHTML
+            "
+        end tell
+
+        set f to open for access POSIX file "{output_dir}/{apt_name}_{floor_num}.html" with write permission
+        write html to f
+        close access f
+
+        ''')
+
+    blocks_text = "\n".join(blocks)
+
+    return f'''
+
+    tell application "Google Chrome"
+        activate
+    end tell
+
+    delay 2
+
+    {blocks_text}
+
+    tell application "Google Chrome"
+        close active tab of front window
+    end tell
+
+    '''
+
+
+
+# ------------------------------------------------------------------------------
+# Sightmaps
+# ------------------------------------------------------------------------------
 
 def sightmap_script(url, output_dir, apt_name):
 
@@ -295,9 +463,6 @@ def sightmap_script(url, output_dir, apt_name):
     end tell
     '''
 
-
-### Original Sightmap Script
-
 def og_sightmap_script(url, output_dir, apt_name):
 
     return f'''
@@ -355,3 +520,123 @@ def og_sightmap_script(url, output_dir, apt_name):
         close active tab of front window
     end tell
     '''
+
+def sightmap_vertical_script(url, output_dir, apt_name):
+
+    return f'''
+    tell application "Google Chrome"
+        activate
+        open location "{url}"
+    end tell
+
+    delay 7
+
+    -- count floors with availability
+    tell application "Google Chrome"
+        set floorCount to execute front window's active tab javascript "
+            Array.from(document.querySelectorAll('#floor-vertical-select li'))
+                .filter(function(li) {{
+                    var label = (li.getAttribute('aria-label') || '').toLowerCase();
+                    return label.indexOf('. 0 apt') === -1;
+                }}).length;
+        "
+    end tell
+
+    repeat with i from 0 to (floorCount - 1)
+
+        -- click floor
+        tell application "Google Chrome"
+            execute front window's active tab javascript "
+                Array.from(document.querySelectorAll('#floor-vertical-select li'))
+                    .filter(function(li) {{
+                        var label = (li.getAttribute('aria-label') || '').toLowerCase();
+                        return label.indexOf('. 0 apt') === -1;
+                    }})[" & i & "].click();
+            "
+        end tell
+
+        delay 1
+
+        -- grab HTML
+        tell application "Google Chrome"
+            set html to execute front window's active tab javascript "
+                document.documentElement.outerHTML
+            "
+        end tell
+
+        -- save file
+        set filePath to "{output_dir}/{apt_name}_" & i & ".html"
+        set f to open for access POSIX file filePath with write permission
+        write html to f
+        close access f
+
+        delay 1
+
+    end repeat
+
+    tell application "Google Chrome"
+        close active tab of front window
+    end tell
+    '''
+
+def sightmap_horizontal_script(url, output_dir, apt_name):
+
+    return f'''
+    tell application "Google Chrome"
+        activate
+        open location "{url}"
+    end tell
+
+    delay 7
+
+    -- count floors with availability
+    tell application "Google Chrome"
+        set floorCount to execute front window's active tab javascript "
+            Array.from(document.querySelectorAll('#floor-horizontal-select li'))
+                .filter(function(li) {{
+                    var label = (li.getAttribute('aria-label') || '').toLowerCase();
+                    return label.indexOf('. 0 apt') === -1;
+                }}).length;
+        "
+    end tell
+
+    repeat with i from 0 to (floorCount - 1)
+
+        -- click floor
+        tell application "Google Chrome"
+            execute front window's active tab javascript "
+                Array.from(document.querySelectorAll('#floor-horizontal-select li'))
+                    .filter(function(li) {{
+                        var label = (li.getAttribute('aria-label') || '').toLowerCase();
+                        return label.indexOf('. 0 apt') === -1;
+                    }})[" & i & "].click();
+            "
+        end tell
+
+        delay 1
+
+        -- grab HTML
+        tell application "Google Chrome"
+            set html to execute front window's active tab javascript "
+                document.documentElement.outerHTML
+            "
+        end tell
+
+        -- save file
+        set filePath to "{output_dir}/{apt_name}_" & i & ".html"
+        set f to open for access POSIX file filePath with write permission
+        write html to f
+        close access f
+
+        delay 1
+
+    end repeat
+
+    tell application "Google Chrome"
+        close active tab of front window
+    end tell
+    '''
+
+
+
+

@@ -1,10 +1,15 @@
 
 import subprocess
+import time
+import random
+import glob
 import os
 import pandas as pd
 from bs4 import BeautifulSoup
 import re
-from reusablescripts import landing_script, sightmap_script, sightmap_horizontal_script
+import json
+from datetime import date
+from reusablescripts import landing_script, sightmap_script, sightmap_vertical_script
 
 
 # ===============================================================
@@ -13,11 +18,11 @@ from reusablescripts import landing_script, sightmap_script, sightmap_horizontal
 
 TODAYS_DATE = "2025-TODAY"
 
-APT_NAME = "residencesontheavenue"
-FOLDER_NAME = "ResidencesOnTheAvenue"
+APT_NAME = "ventureoni"
+FOLDER_NAME = "VentureOnI"
 
-BASE_URL = "https://www.residencesontheavenue.com/"
-MAIN_URL = "https://www.residencesontheavenue.com/floorplans"
+BASE_URL = "https://www.ventureoni.com"
+MAIN_URL = "https://www.ventureoni.com/site-map"
 
 OUTPUT_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/" + TODAYS_DATE + "/" + FOLDER_NAME + "/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -25,42 +30,40 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 MAIN_HTML_FILE = OUTPUT_DIR + APT_NAME + ".html"
 MAIN_CSV_FILE = OUTPUT_DIR + APT_NAME + ".csv"
 
-SIGHTMAP_HTML_FILE = OUTPUT_DIR + APT_NAME + "-sightmap.html"
+# SIGHTMAP_HTML_FILE = OUTPUT_DIR + APT_NAME + "-sightmap.html"
 
 
 # ===============================================================
 # Get HTML (Main)
 # ===============================================================
 
-main_script = landing_script(MAIN_URL, MAIN_HTML_FILE)
-subprocess.run(["osascript", "-e", main_script])
+# main_script = landing_script(MAIN_URL, MAIN_HTML_FILE)
+# subprocess.run(["osascript", "-e", main_script])
 
 # ===============================================================
 # Get URL (Sightmap)
 # ===============================================================
 
-with open(MAIN_HTML_FILE, "r", encoding="utf-8", errors="ignore") as f:
-    soup = BeautifulSoup(f, "lxml")
+# with open(MAIN_HTML_FILE, "r", encoding="utf-8", errors="ignore") as f:
+#     soup = BeautifulSoup(f, "lxml")
 
-iframe = soup.find("iframe", src=lambda s: s and "sightmap.com/embed" in s)
-embed_url = iframe["src"] if iframe else None
+# iframe = soup.find("iframe", src=lambda s: s and "sightmap.com/embed" in s)
+# embed_url = iframe["src"] if iframe else None
 
-# iframe = soup.select_one("#ipm-embed-container iframe")
-# embed_url = iframe["src"] if iframe and iframe.has_attr("src") else None
 
 # ===============================================================
 # Get HTML (Sightmap)
 # ===============================================================
 
-main_sightmap_script = sightmap_horizontal_script(embed_url, OUTPUT_DIR, APT_NAME)
-subprocess.run(["osascript", "-e", main_sightmap_script])
+# main_sightmap_script = sightmap_vertical_script(embed_url, OUTPUT_DIR, APT_NAME)
+# subprocess.run(["osascript", "-e", main_sightmap_script])
 
 # ===============================================================
 # Get Data (Floorplan Details)
 # ===============================================================
 
 rows = []
-pattern = re.compile(r"^residencesontheavenue_\d+\.html$")
+pattern = re.compile(rf"^{re.escape(APT_NAME)}_\d+\.html$")
 
 for filename in os.listdir(OUTPUT_DIR):
 
@@ -75,13 +78,13 @@ for filename in os.listdir(OUTPUT_DIR):
 
     for btn in unit_list.select("button"):
         text = btn.get_text(" ", strip=True)
-
+        
         # unit number
         unit_number_match = re.search(r"APT\s+([A-Z0-9]+)", text)
         unit_number = unit_number_match.group(1) if unit_number_match else None
 
         # floorplan name
-        fp_span = btn.select_one("span.css-mgzm29")
+        fp_span = btn.select_one("span.css-y52d0e")
         floorplan_name = fp_span.get_text(strip=True) if fp_span else None
 
         # square footage

@@ -4,17 +4,18 @@ import os
 import re
 from reusablescripts import gables_script, gables_get_data
 
+
 # ===============================================================
 # Configuration
 # ===============================================================
 
 TODAYS_DATE = "2025-TODAY"
 
-APT_NAME = "westbrookeplace"
-FOLDER_NAME = "WestbrookePlace"
+APT_NAME = "gablesunionmarket"
+FOLDER_NAME = "GablesUnionMarket"
 
-BASE_URL = "https://www.gables.com/westbrookeplace"
-MAIN_URL = "https://www.gables.com/westbrookeplace#floor-plans"
+BASE_URL = "https://www.gables.com/unionmarket"
+MAIN_URL = "https://www.gables.com/unionmarket#floor-plans"
 
 OUTPUT_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/" + TODAYS_DATE + "/" + FOLDER_NAME + "/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)

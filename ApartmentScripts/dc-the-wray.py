@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 from datetime import date
-
+from reusablescripts import paginated_script
 
 # ===============================================================
 # Configuration
@@ -32,72 +32,22 @@ MAIN_CSV_FILE = OUTPUT_DIR + APT_NAME + ".csv"
 
 
 # ===============================================================
-# Helper Functions
-# ===============================================================
-
-def run_script(url, output_dir, base_name):
-
-    return f'''
-    set pageNum to 1
-
-    tell application "Google Chrome"
-        activate
-        open location "{url}"
-    end tell
-
-    delay 10
-
-    repeat
-        -- save current page
-        tell application "Google Chrome"
-            set html to execute front window's active tab javascript "
-                document.documentElement.outerHTML
-            "
-        end tell
-
-        set filePath to "{output_dir}" & "{base_name}_" & pageNum & ".html"
-        set f to open for access POSIX file filePath with write permission
-        write html to f
-        close access f
-
-        -- get Next page URL from pagination
-        tell application "Google Chrome"
-            set nextURL to execute front window's active tab javascript "
-                (function () {{
-                    var nextLink = document.querySelector('.pagination a:has(span.pag_next)');
-                    return nextLink ? nextLink.href : '';
-                }})();
-            "
-        end tell
-
-        if nextURL is \"\" then
-            exit repeat
-        end if
-
-        -- navigate to next page
-        tell application "Google Chrome"
-            tell front window's active tab
-                execute javascript "
-                    window.location.href = '" & nextURL & "';
-                "
-            end tell
-        end tell
-
-        set pageNum to pageNum + 1
-        delay 8
-    end repeat
-
-    tell application "Google Chrome"
-        close active tab of front window
-    end tell
-    '''
-
-
-# ===============================================================
 # Get HTML (Floor Details)
 # ===============================================================
 
-main_script = run_script(MAIN_URL, OUTPUT_DIR, APT_NAME)
+has_next = """
+(function () {
+    var nextLink = document.querySelector('.pagination a:has(span.pag_next)');
+    return nextLink ? 'YES' : '';
+})();
+"""
+
+go_next = """
+var nextLink = document.querySelector('.pagination a:has(span.pag_next)');
+if (nextLink) window.location.href = nextLink.href;
+"""
+
+main_script = paginated_script(MAIN_URL, OUTPUT_DIR, APT_NAME, has_next, go_next)
 subprocess.run(["osascript", "-e", main_script])
 
 
@@ -106,7 +56,7 @@ subprocess.run(["osascript", "-e", main_script])
 # ===============================================================
 
 rows = []
-pattern = re.compile(r"^thewray_\d+\.html$")
+pattern = re.compile(rf"^{re.escape(APT_NAME)}_\d+\.html$")
 
 for filename in os.listdir(OUTPUT_DIR):
 

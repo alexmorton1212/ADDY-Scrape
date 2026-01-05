@@ -1,14 +1,8 @@
 
 import subprocess
-import time
-import random
-import glob
 import os
 import pandas as pd
 from bs4 import BeautifulSoup
-import re
-import json
-from datetime import date
 from reusablescripts import landing_script, og_sightmap_script, sightmap_script
 
 
@@ -22,7 +16,7 @@ APT_NAME = "accolade"
 FOLDER_NAME = "Accolade"
 
 BASE_URL = "https://www.liveaccolade.com"
-MAIN_URL = "https://www.liveaccolade.com/sightmap/"
+MAIN_URL = "https://liveaccolade.securecafe.com/onlineleasing/accolade0/oleapplication.aspx?stepname=Apartments&myOlePropertyId=2012536&floorPlans=5803543"
 
 OUTPUT_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/" + TODAYS_DATE + "/" + FOLDER_NAME + "/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -43,18 +37,18 @@ subprocess.run(["osascript", "-e", main_script])
 # Get URL (Sightmap)
 # ===============================================================
 
-with open(MAIN_HTML_FILE, "r", encoding="utf-8", errors="ignore") as f:
-    soup = BeautifulSoup(f, "lxml")
+# with open(MAIN_HTML_FILE, "r", encoding="utf-8", errors="ignore") as f:
+#     soup = BeautifulSoup(f, "lxml")
 
-iframe = soup.find("iframe", src=lambda x: x and "sightmap.com/embed" in x)
-embed_url_long = iframe["src"] if iframe and iframe.has_attr("src") else None
-embed_url = embed_url_long.split("?", 1)[0] if embed_url_long else None
+# iframe = soup.find("iframe", src=lambda x: x and "sightmap.com/embed" in x)
+# embed_url_long = iframe["src"] if iframe and iframe.has_attr("src") else None
+# embed_url = embed_url_long.split("?", 1)[0] if embed_url_long else None
 
 # ===============================================================
 # Get HTML (Sightmap)
 # ===============================================================
 
-print(embed_url)
+# print(embed_url)
 
 # main_sightmap_script = sightmap_script(embed_url, OUTPUT_DIR, APT_NAME)
 # subprocess.run(["osascript", "-e", main_sightmap_script])

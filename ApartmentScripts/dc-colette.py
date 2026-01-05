@@ -1,15 +1,9 @@
 
-
 import subprocess
-import time
-import random
-import glob
 import os
 import pandas as pd
 from bs4 import BeautifulSoup
 import re
-import json
-from datetime import date
 from reusablescripts import engrain_get_labels, engrain_script
 
 # ===============================================================
@@ -18,11 +12,11 @@ from reusablescripts import engrain_get_labels, engrain_script
 
 TODAYS_DATE = "2025-TODAY"
 
-APT_NAME = "balsa"
-FOLDER_NAME = "Balsa"
+APT_NAME = "colette"
+FOLDER_NAME = "Colette"
 
-BASE_URL = "https://livebalsa.com"
-MAIN_URL = "https://livebalsa.com/floorplans/"
+BASE_URL = "https://livecolettedc.com"
+MAIN_URL = "https://livecolettedc.com/floorplans/"
 
 OUTPUT_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/" + TODAYS_DATE + "/" + FOLDER_NAME + "/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -53,7 +47,7 @@ subprocess.run(["osascript", "-e", big_script], capture_output=True, text=True)
 # ===============================================================
 
 rows = []
-pattern = re.compile(r"^balsa_")
+pattern = re.compile(rf"^{re.escape(APT_NAME)}_.+\.html$")
 
 for filename in os.listdir(OUTPUT_DIR):
 
@@ -76,7 +70,7 @@ for filename in os.listdir(OUTPUT_DIR):
         availability = ("Now" if "Now" in avail_raw else avail_raw.replace("Available ", ""))
 
         # STARTING PRICE
-        price_text = card.select_one(".jd-fp-strong-text").get_text()
+        price_text = card.select_one(".jd-fp-card-info-term-and-base--base").get_text()
         price = int(re.search(r"\$([\d,]+)", price_text).group(1).replace(",", ""))
 
         # SQFT
