@@ -3,7 +3,8 @@ import os
 import json
 import pandas as pd
 from bs4 import BeautifulSoup
-from playwright_scripts import single_page_script
+from scripts_playwright import single_page_script
+
 
 # ===============================================================
 # Configuration
