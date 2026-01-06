@@ -3,7 +3,7 @@ import os
 import re
 import pandas as pd
 from bs4 import BeautifulSoup
-from playwright_scripts import paginated_inplace_script
+from scripts_playwright import paginated_inplace_script
 
 
 # -----------------------------------------------------------------------------------
