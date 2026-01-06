@@ -11,8 +11,6 @@ from bs4 import BeautifulSoup
 # Gables Data
 # -----------------------------------------------------------------------------------
 
-### Gables Dupont Circle, Westbrooke Place
-
 def data_gables(json_path, csv_path):
 
     with open(json_path, "r", encoding="utf-8") as f:
@@ -40,8 +38,6 @@ def data_gables(json_path, csv_path):
 # Sightmap Data
 # -----------------------------------------------------------------------------------
 
-### Accolade
-
 def data_sightmap(json_path, csv_path):
 
     with open(json_path, "r", encoding="utf-8") as f:
@@ -53,15 +49,18 @@ def data_sightmap(json_path, csv_path):
     rows = []
 
     for unit in units:
-        floorplan_json = floorplan_lookup.get(unit.get("floor_plan_id"))
-        floorplan_name = json.loads(floorplan_json).get("name")
+
+        floorplan_name = floorplan_lookup.get(unit.get("floor_plan_id"))
+        if isinstance(floorplan_name, str) and floorplan_name.startswith("{"):
+            floorplan_name = json.loads(floorplan_name).get("name")
+    
         rows.append({
             "unit_number": unit.get("unit_number"),
             "floorplan_name": floorplan_name,
             "available_date": unit.get("available_on"),
             "starting_rent": unit.get("price"),
             "square_feet": unit.get("area"),
-            "building_number": None,
+            "building_number": unit.get("building"),
             "amenities": None,
             "specials": None
         })

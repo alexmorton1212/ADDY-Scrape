@@ -179,10 +179,12 @@ def response_script(url, output_file, response_matcher):
 
         page.on("response", handle_response)
         page.goto(url, wait_until="domcontentloaded")
-        page.wait_for_timeout(8000)
+        page.wait_for_timeout(6000)
         if not captured:
-            page.wait_for_timeout(10000)
-
+            page.wait_for_timeout(6000)
+            if not captured:
+                page.wait_for_timeout(6000)
+                
         page.close()
         context.close()
         browser.close()
