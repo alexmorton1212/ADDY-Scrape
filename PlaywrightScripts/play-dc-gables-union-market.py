@@ -8,11 +8,11 @@ from scripts_data import data_gables
 # Configuration
 # -----------------------------------------------------------------------------------
 
-FOLDER_NAME = "GablesDupontCircle"
+FOLDER_NAME = "GablesUnionMarket"
 APT_NAME = FOLDER_NAME.lower()
 
-BASE_URL = "https://www.gables.com/dupontcircle"
-MAIN_URL = "https://www.gables.com/dupontcircle#floor-plans"
+BASE_URL = "https://www.gables.com/unionmarket"
+MAIN_URL = "https://www.gables.com/unionmarket#floor-plans"
 
 MAIN_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/PlaywrightOutputs"
 os.makedirs(MAIN_DIR, exist_ok=True)

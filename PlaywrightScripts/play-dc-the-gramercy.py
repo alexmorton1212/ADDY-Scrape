@@ -1,18 +1,18 @@
 
 import os
-from scripts_playwright import response_script
-from scripts_data import data_gables
+from scripts_playwright import single_page_script
+from scripts_data import data_udr
 
 
 # -----------------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------------
 
-FOLDER_NAME = "GablesDupontCircle"
-APT_NAME = FOLDER_NAME.lower()
+APT_NAME = "thegramercy"
+FOLDER_NAME = "TheGramercy"
 
-BASE_URL = "https://www.gables.com/dupontcircle"
-MAIN_URL = "https://www.gables.com/dupontcircle#floor-plans"
+BASE_URL = "https://www.gramercyapts.com"
+MAIN_URL = "https://gramercyapts.securecafe.com/onlineleasing/the-gramercy-2/oleapplication.aspx?RCStandardCampaignId_1236432=437778&propleadsource_1236432=portal&stepname=Apartments&myOlePropertyId=1236432"
 
 MAIN_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/PlaywrightOutputs"
 os.makedirs(MAIN_DIR, exist_ok=True)
@@ -23,7 +23,7 @@ os.makedirs(HTML_DIR, exist_ok=True)
 DATA_DIR = f"{MAIN_DIR}/Data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-MAIN_JSON_FILE = f"{HTML_DIR}/{APT_NAME}.json"
+MAIN_HTML_FILE = f"{HTML_DIR}/{APT_NAME}.html"
 MAIN_CSV_FILE = f"{DATA_DIR}/{APT_NAME}.csv"
 
 
@@ -31,19 +31,11 @@ MAIN_CSV_FILE = f"{DATA_DIR}/{APT_NAME}.csv"
 # Get HTML (Main)
 # -----------------------------------------------------------------------------------
 
-def response_criteria(response):
-    url = response.url.lower()
-    return (
-        "doorway-api" in url
-        and "property" in url
-        and "units" in url
-    )
-
-response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
+single_page_script(MAIN_URL, MAIN_HTML_FILE)
 
 
 # -----------------------------------------------------------------------------------
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-data_gables(MAIN_JSON_FILE, MAIN_CSV_FILE)
+# data_udr(MAIN_HTML_FILE, MAIN_CSV_FILE)

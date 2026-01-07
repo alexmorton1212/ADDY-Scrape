@@ -129,9 +129,36 @@ def data_udr(html_path, csv_path):
     pd.DataFrame(rows).to_csv(csv_path, index=False)
 
 
+# -----------------------------------------------------------------------------------
+#  Wydown Data
+# -----------------------------------------------------------------------------------
 
+### The Heywood
 
+def data_wydown(json_path, csv_path, json_name):
 
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
+    rows = []
 
+    for unit in data["values"]:
+
+        unit_data = unit["data"]
+        property_list = unit["data"]["property_lists"]
+
+        if any(p.get("name") == json_name for p in property_list):
+
+            rows.append({
+                "unit_number": unit_data.get("address_address1"),
+                "floorplan_name": unit_data.get("marketing_title"),
+                "available_date": unit_data.get("available_date"),
+                "starting_rent": unit_data.get("market_rent"),
+                "square_feet": unit_data.get("square_feet"),
+                "building_number": None,
+                "amenities": None,
+                "specials": None
+            })
+
+    pd.DataFrame(rows).to_csv(csv_path, index=False)
 

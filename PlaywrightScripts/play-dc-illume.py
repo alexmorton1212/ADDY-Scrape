@@ -1,18 +1,18 @@
 
 import os
 from scripts_playwright import response_script
-from scripts_data import data_gables
+from scripts_data import data_sightmap
 
 
 # -----------------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------------
 
-FOLDER_NAME = "GablesDupontCircle"
+FOLDER_NAME = "Illume"
 APT_NAME = FOLDER_NAME.lower()
 
-BASE_URL = "https://www.gables.com/dupontcircle"
-MAIN_URL = "https://www.gables.com/dupontcircle#floor-plans"
+BASE_URL = "https://illumedc.com"
+MAIN_URL = "https://www.bozzuto.com/apartments-for-rent/dc/washington/illume/property-map/"
 
 MAIN_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/PlaywrightOutputs"
 os.makedirs(MAIN_DIR, exist_ok=True)
@@ -34,9 +34,9 @@ MAIN_CSV_FILE = f"{DATA_DIR}/{APT_NAME}.csv"
 def response_criteria(response):
     url = response.url.lower()
     return (
-        "doorway-api" in url
-        and "property" in url
-        and "units" in url
+        "sightmap" in url
+        and "api" in url
+        and "sightmaps" in url
     )
 
 response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
@@ -46,4 +46,4 @@ response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-data_gables(MAIN_JSON_FILE, MAIN_CSV_FILE)
+data_sightmap(MAIN_JSON_FILE, MAIN_CSV_FILE)

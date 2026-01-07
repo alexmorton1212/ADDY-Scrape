@@ -1,18 +1,18 @@
 
 import os
 from scripts_playwright import response_script
-from scripts_data import data_gables
+from scripts_data import data_udr
 
 
 # -----------------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------------
 
-FOLDER_NAME = "GablesDupontCircle"
+FOLDER_NAME = "FlatsOnTheHill"
 APT_NAME = FOLDER_NAME.lower()
 
-BASE_URL = "https://www.gables.com/dupontcircle"
-MAIN_URL = "https://www.gables.com/dupontcircle#floor-plans"
+BASE_URL = "https://brandfordmanagement.managebuilding.com/Resident/public/custom/20"
+MAIN_URL = "https://brandfordmanagement.managebuilding.com/Resident/public/custom/20"
 
 MAIN_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/PlaywrightOutputs"
 os.makedirs(MAIN_DIR, exist_ok=True)
@@ -34,9 +34,9 @@ MAIN_CSV_FILE = f"{DATA_DIR}/{APT_NAME}.csv"
 def response_criteria(response):
     url = response.url.lower()
     return (
-        "doorway-api" in url
-        and "property" in url
-        and "units" in url
+        "tenantturner" in url
+        and "listing" in url
+        and "json" in url
     )
 
 response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
@@ -46,4 +46,4 @@ response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-data_gables(MAIN_JSON_FILE, MAIN_CSV_FILE)
+# data_udr(MAIN_HTML_FILE, MAIN_CSV_FILE)
