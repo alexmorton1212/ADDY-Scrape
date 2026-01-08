@@ -1,18 +1,18 @@
 
 import os
-from scripts_playwright import response_script
-from scripts_data import data_urby
+from scripts_playwright import single_page_script, response_script
+from scripts_data import data_sightmap
 
 
 # -----------------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------------
 
-APT_NAME = "urbynavyyard"
-FOLDER_NAME = "UrbyNavyYard"
+FOLDER_NAME = "CodaOnHalf"
+APT_NAME = FOLDER_NAME.lower()
 
-BASE_URL = "https://www.urby.com/location/washington-dc"
-MAIN_URL = "https://www.urby.com/location/washington-dc/availability"
+BASE_URL = "https://www.codaonhalf.com"
+MAIN_URL = "https://codaonhalf.securecafe.com/onlineleasing/41-l-st-se-washington-dc-20003/oleapplication.aspx?propleadsource_1489620=portal&stepname=Apartments&myOlePropertyId=1489620"
 
 MAIN_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/PlaywrightOutputs"
 os.makedirs(MAIN_DIR, exist_ok=True)
@@ -23,24 +23,19 @@ os.makedirs(HTML_DIR, exist_ok=True)
 DATA_DIR = f"{MAIN_DIR}/Data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-MAIN_JSON_FILE = f"{HTML_DIR}/{APT_NAME}.json"
 MAIN_CSV_FILE = f"{DATA_DIR}/{APT_NAME}.csv"
+MAIN_HTML_FILE = f"{HTML_DIR}/{APT_NAME}.html"
+
 
 # -----------------------------------------------------------------------------------
 # Get HTML (Main)
 # -----------------------------------------------------------------------------------
 
-def response_criteria(response):
-    url = response.url.lower()
-    return (
-        "getfilteredunitsbycity" in url
-        and "city=washington-dc" in url
-    )
+single_page_script(MAIN_URL, MAIN_HTML_FILE)
 
-response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
 
 # -----------------------------------------------------------------------------------
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-data_urby(MAIN_JSON_FILE, MAIN_CSV_FILE)
+# data_sightmap(MAIN_JSON_FILE, MAIN_CSV_FILE)

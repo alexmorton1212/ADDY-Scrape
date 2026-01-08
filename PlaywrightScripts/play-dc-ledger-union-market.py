@@ -1,7 +1,7 @@
 
 import os
 from scripts_playwright import single_page_script
-from scripts_data import data_udr
+from scripts_data import data_greystar
 
 
 # -----------------------------------------------------------------------------------
@@ -38,4 +38,5 @@ single_page_script(MAIN_URL, MAIN_HTML_FILE)
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-# data_udr(MAIN_HTML_FILE, MAIN_CSV_FILE)
+
+data_greystar(MAIN_HTML_FILE, MAIN_CSV_FILE)

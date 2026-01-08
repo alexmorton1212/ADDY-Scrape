@@ -191,6 +191,44 @@ def response_script(url, output_file, response_matcher):
         browser.close()
 
 
+def response_doc_script(url, output_file, response_matcher):
+
+    with sync_playwright() as p:
+
+        browser = p.chromium.launch(channel=CHANNEL, headless=HEADLESS)
+        context = browser.new_context(user_agent=USER_AGENT, viewport=VIEWPORT)
+        page = context.new_page()
+        captured = False
+
+        def handle_response(response):
+
+            nonlocal captured
+            
+            try:
+                if not captured and response_matcher(response):
+                    html = response.text()
+                    with open(output_file, "w", encoding="utf-8") as f:
+                        f.write(html)
+                    captured = True
+
+            except Exception: pass
+
+        page.on("response", handle_response)
+        page.goto(url, wait_until="domcontentloaded")
+        
+        page.wait_for_timeout(6000)
+        if not captured:
+            page.wait_for_timeout(6000)
+            if not captured:
+                page.wait_for_timeout(6000)
+                
+        page.close()
+        context.close()
+        browser.close()
+
+
+
+
 # -----------------------------------------------------------------------------------
 # SecureCafe Scripts
 # -----------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 
 import os
 from scripts_playwright import response_script
-from scripts_data import data_udr
+from scripts_data import data_bradford
 
 
 # -----------------------------------------------------------------------------------
@@ -46,4 +46,4 @@ response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-# data_udr(MAIN_HTML_FILE, MAIN_CSV_FILE)
+data_bradford(MAIN_JSON_FILE, MAIN_CSV_FILE)

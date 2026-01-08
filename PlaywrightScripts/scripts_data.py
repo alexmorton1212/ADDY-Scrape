@@ -4,34 +4,9 @@
 # ===================================================================================
 
 import json
+import re
 import pandas as pd
 from bs4 import BeautifulSoup
-
-# -----------------------------------------------------------------------------------
-# Gables Data
-# -----------------------------------------------------------------------------------
-
-def data_gables(json_path, csv_path):
-
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    units = data["units_data"]["units"]
-
-    rows = []
-    for unit in units:
-        rows.append({
-            "unit_number": unit.get("name"),
-            "floorplan_name": unit.get("layoutName"),
-            "available_date": unit.get("availableOn"),
-            "starting_rent": unit.get("displayPrice"),
-            "square_feet": unit.get("area"),
-            "building_number": None,
-            "amenities": None,
-            "specials": None
-        })
-
-    pd.DataFrame(rows).to_csv(csv_path, index=False)
 
 
 # -----------------------------------------------------------------------------------
@@ -69,10 +44,35 @@ def data_sightmap(json_path, csv_path):
 
 
 # -----------------------------------------------------------------------------------
-#  UDR Data
+# Gables Data
 # -----------------------------------------------------------------------------------
 
-### 1301 Thomas Circle, Andover House
+def data_gables(json_path, csv_path):
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    units = data["units_data"]["units"]
+
+    rows = []
+    for unit in units:
+        rows.append({
+            "unit_number": unit.get("name"),
+            "floorplan_name": unit.get("layoutName"),
+            "available_date": unit.get("availableOn"),
+            "starting_rent": unit.get("displayPrice"),
+            "square_feet": unit.get("area"),
+            "building_number": None,
+            "amenities": None,
+            "specials": None
+        })
+
+    pd.DataFrame(rows).to_csv(csv_path, index=False)
+
+
+# -----------------------------------------------------------------------------------
+#  UDR Data
+# -----------------------------------------------------------------------------------
 
 def data_udr(html_path, csv_path):
 
@@ -133,8 +133,6 @@ def data_udr(html_path, csv_path):
 #  Wydown Data
 # -----------------------------------------------------------------------------------
 
-### The Heywood
-
 def data_wydown(json_path, csv_path, json_name):
 
     with open(json_path, "r", encoding="utf-8") as f:
@@ -161,4 +159,96 @@ def data_wydown(json_path, csv_path, json_name):
             })
 
     pd.DataFrame(rows).to_csv(csv_path, index=False)
+
+
+# -----------------------------------------------------------------------------------
+#  Bradford Data
+# -----------------------------------------------------------------------------------
+
+def data_bradford(json_path, csv_path):
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    rows = []
+
+    for unit in data:
+
+        keywords = ("waive", "free", "month")
+        descr_parts = re.split(r"<br\s*/?>", unit.get("description"), flags=re.IGNORECASE)
+        descr_result = next((part.strip() for part in descr_parts if any(k in part.lower() for k in keywords)),None)
+        building, unit_part = unit.get("title").split("#", 1)
+
+        rows.append({
+            "unit_number": unit_part.strip().split()[0],
+            "floorplan_name": unit.get("propertyType"),
+            "available_date": unit.get("dateAvailable"),
+            "starting_rent": unit.get("rentAmount"),
+            "square_feet": unit.get("area"),
+            "building_number": building.strip(),
+            "amenities": None,
+            "specials": descr_result
+        })
+
+    pd.DataFrame(rows).to_csv(csv_path, index=False)
+
+
+# -----------------------------------------------------------------------------------
+#  Urby Data
+# -----------------------------------------------------------------------------------
+
+def data_urby(json_path, csv_path):
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    units = data["units"]
+    rows = []
+
+    for unit in units:
+        rows.append({
+            "unit_number": unit.get("unitNumber"),
+            "floorplan_name": unit.get("floorplanName"),
+            "available_date": unit["unitSpaces"]["unitSpace"][0].get("availableDate"),
+            "starting_rent": unit["unitSpaces"]["unitSpace"][0].get("effectiveRent"),
+            "square_feet": unit.get("SquareFeet"),
+            "building_number": None,
+            "amenities": None,
+            "specials": None
+        })
+
+    pd.DataFrame(rows).to_csv(csv_path, index=False)
+
+
+# -----------------------------------------------------------------------------------
+#  Greystar Data
+# -----------------------------------------------------------------------------------
+
+def data_greystar(html_path, csv_path):
+
+    rows = []
+
+    with open(html_path, "r", encoding="utf-8", errors="ignore") as f:
+        soup = BeautifulSoup(f, "lxml")
+
+    next_data = soup.find("script", id="__NEXT_DATA__")
+    if not next_data: raise ValueError("__NEXT_DATA__ not found")
+    data = json.loads(next_data.string)
+    units = data["props"]["pageProps"]["page"]["layout"]["sitecore"]["context"]["property"]["availableUnits"]
+
+    for unit in units:
+        rows.append({
+            "unit_number": unit.get("unitNumber"),
+            "floorplan_name": unit.get("floorPlanLabel"),
+            "available_date": unit.get("availableOn"),
+            "starting_rent": unit.get("minBasePrice"),
+            "square_feet": unit.get("area"),
+            "building_number": None,
+            "amenities": None,
+            "specials": None
+        })
+
+    pd.DataFrame(rows).to_csv(csv_path, index=False)
+
+
 
