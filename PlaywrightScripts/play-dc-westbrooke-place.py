@@ -1,7 +1,7 @@
 
 import os
 from scripts_playwright import response_script
-from scripts_data import data_gables
+from scripts_data import data_knock
 
 # -----------------------------------------------------------------------------------
 # Configuration
@@ -34,7 +34,7 @@ def response_criteria(response):
     url = response.url.lower()
     return (
         "doorway-api" in url
-        and "property" in url
+        and "knockrentals" in url
         and "units" in url
     )
 
@@ -45,4 +45,4 @@ response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-data_gables(MAIN_JSON_FILE, MAIN_CSV_FILE)
+data_knock(MAIN_JSON_FILE, MAIN_CSV_FILE)

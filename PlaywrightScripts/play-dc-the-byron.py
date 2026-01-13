@@ -9,9 +9,7 @@ from scripts_data import data_sightmap
 # -----------------------------------------------------------------------------------
 
 FOLDER_NAME = "TheByron"
-APT_NAME = FOLDER_NAME.lower()
 
-BASE_URL = "https://livethebyrondc.com/"
 MAIN_URL = "https://livethebyrondc.com/floorplans/"
 
 MAIN_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/PlaywrightOutputs"
@@ -23,8 +21,8 @@ os.makedirs(HTML_DIR, exist_ok=True)
 DATA_DIR = f"{MAIN_DIR}/Data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-MAIN_JSON_FILE = f"{HTML_DIR}/{APT_NAME}.json"
-MAIN_CSV_FILE = f"{DATA_DIR}/{APT_NAME}.csv"
+MAIN_JSON_FILE = f"{HTML_DIR}/{FOLDER_NAME.lower()}.json"
+MAIN_CSV_FILE = f"{DATA_DIR}/{FOLDER_NAME.lower()}.csv"
 
 
 # -----------------------------------------------------------------------------------

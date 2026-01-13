@@ -1,7 +1,7 @@
 
 import os
-from scripts_playwright import single_page_script, response_script
-from scripts_data import data_sightmap
+from scripts_playwright import single_page_script
+from scripts_data import data_pynwheel
 
 
 # -----------------------------------------------------------------------------------
@@ -38,4 +38,4 @@ single_page_script(MAIN_URL, MAIN_HTML_FILE)
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-# data_sightmap(MAIN_JSON_FILE, MAIN_CSV_FILE)
+data_pynwheel(MAIN_HTML_FILE, MAIN_CSV_FILE)

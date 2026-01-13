@@ -1,7 +1,7 @@
 
 import os
-from scripts_playwright import single_page_script, response_script
-from scripts_data import data_sightmap
+from scripts_playwright import single_page_script
+from scripts_data import data_securecafe
 
 
 # -----------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ FOLDER_NAME = "WestEndResidences"
 APT_NAME = FOLDER_NAME.lower()
 
 BASE_URL = "https://www.westendresidencesdc.com"
-MAIN_URL = "https://westendresidencesdc.securecafe.com/onlineleasing/west-end-residences/oleapplication.aspx?propleadsource_227428=portal&stepname=Apartments&myOlePropertyId=227428"
+MAIN_URL = "https://westendresidencesdc.securecafe.com/onlineleasing/west-end-residences/oleapplication.aspx?RCStandardCampaignId_227428=576455&propleadsource_227428=portal&stepname=Apartments&myOlePropertyId=227428"
 
 MAIN_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/PlaywrightOutputs"
 os.makedirs(MAIN_DIR, exist_ok=True)
@@ -38,4 +38,4 @@ single_page_script(MAIN_URL, MAIN_HTML_FILE)
 # Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-# data_sightmap(MAIN_JSON_FILE, MAIN_CSV_FILE)
+data_securecafe(MAIN_HTML_FILE, MAIN_CSV_FILE)

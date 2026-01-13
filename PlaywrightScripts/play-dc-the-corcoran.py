@@ -1,36 +1,49 @@
 
 import os
-from scripts_playwright import single_page_script
-from scripts_data import data_westend25
+from scripts_playwright import response_script
+from scripts_data import data_knock
+
 
 # -----------------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------------
 
-FOLDER_NAME = "WestEnd25"
+FOLDER_NAME = "TheCorcoran"
+APT_NAME = FOLDER_NAME.lower()
 
-MAIN_URL = "https://www.westend25apts.com/washington/westend-25/conventional/"
+BASE_URL = "https://corcorandc.com"
+MAIN_URL = "https://corcorandc.com"
 
 MAIN_DIR = "/Users/alexmorton/Desktop/ADDY-Scrape/PlaywrightOutputs"
 os.makedirs(MAIN_DIR, exist_ok=True)
+
 HTML_DIR = f"{MAIN_DIR}/HTML/{FOLDER_NAME}"
 os.makedirs(HTML_DIR, exist_ok=True)
+
 DATA_DIR = f"{MAIN_DIR}/Data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-MAIN_HTML_FILE = f"{HTML_DIR}/{FOLDER_NAME.lower()}.html"
-MAIN_CSV_FILE = f"{DATA_DIR}/{FOLDER_NAME.lower()}.csv"
+MAIN_JSON_FILE = f"{HTML_DIR}/{APT_NAME}.json"
+MAIN_CSV_FILE = f"{DATA_DIR}/{APT_NAME}.csv"
+
 
 # -----------------------------------------------------------------------------------
-# Batch Entrypoint
+# Get HTML (Main)
 # -----------------------------------------------------------------------------------
 
-def run():
-    single_page_script(MAIN_URL, MAIN_HTML_FILE)
-    data_westend25(MAIN_HTML_FILE, MAIN_CSV_FILE)
+def response_criteria(response):
+    url = response.url.lower()
+    return (
+        "doorway-api" in url
+        and "knockrentals" in url
+        and "units" in url
+    )
+
+response_script(MAIN_URL, MAIN_JSON_FILE, response_criteria)
+
 
 # -----------------------------------------------------------------------------------
-# Run Standalone
+# Get Data (Floorplan Details)
 # -----------------------------------------------------------------------------------
 
-if __name__ == "__main__": run()
+data_knock(MAIN_JSON_FILE, MAIN_CSV_FILE)
